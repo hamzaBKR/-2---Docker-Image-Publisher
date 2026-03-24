@@ -1,0 +1,11 @@
+# 1. init and push
+git init && git add . && git commit -m "initial commit"
+git remote add origin https://github.com/YOUR_USERNAME/dockerapp.git
+git push -u origin main
+
+# 2. add secrets on GitHub → Settings → Secrets → Actions
+# DOCKER_USERNAME and DOCKER_PASSWORD
+
+# 3. trigger the pipeline
+git tag v1.0.0
+git push origin v1.0.0

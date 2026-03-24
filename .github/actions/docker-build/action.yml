@@ -1,0 +1,44 @@
+name: Docker Build and Push
+description: Builds a Docker image, tags it with version and latest, then pushes to Docker Hub
+
+inputs:
+  image_name:
+    description: 'Full image name e.g. username/dockerapp'
+    required: true
+  tag:
+    description: 'Version tag e.g. v1.0.0'
+    required: true
+  dockerfile_path:
+    description: 'Path to the Dockerfile'
+    required: false
+    default: './Dockerfile'
+
+outputs:
+  full_image_name:
+    description: 'Full image name with tag e.g. username/dockerapp:v1.0.0'
+    value: ${{ steps.set_output.outputs.full_image_name }}
+
+runs:
+  using: composite
+  steps:
+    - name: Build Docker image
+      run: |
+        docker build \
+          -f ${{ inputs.dockerfile_path }} \
+          -t ${{ inputs.image_name }}:${{ inputs.tag }} \
+          -t ${{ inputs.image_name }}:latest \
+          .
+      shell: bash
+
+    - name: Push version tag
+      run: docker push ${{ inputs.image_name }}:${{ inputs.tag }}
+      shell: bash
+
+    - name: Push latest tag
+      run: docker push ${{ inputs.image_name }}:latest
+      shell: bash
+
+    - name: Set output
+      id: set_output
+      run: echo "full_image_name=${{ inputs.image_name }}:${{ inputs.tag }}" >> $GITHUB_OUTPUT
+      shell: bash
